@@ -10,7 +10,7 @@ const App = () => {
     <Wrapper>
       <QrScannerComponent setShowHort={setShowHort} />
 
-      {1 && (
+      {showHort && (
         <CanvasWrapper showHort={showHort}>
           <CanvasScene />
         </CanvasWrapper>

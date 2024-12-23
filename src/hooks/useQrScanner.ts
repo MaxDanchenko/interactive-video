@@ -7,6 +7,7 @@ const useQrScanner = () => {
   const hasScanned = useRef(false);
 
   const [isScannerActive, setIsScannerActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [scanResult, setScanResult] = useState<string | null>(null);
 
   const handleCloseScanner = useCallback(() => {
@@ -21,35 +22,43 @@ const useQrScanner = () => {
     }
 
     const qrScanner = new QrScanner(videoElement, async (result) => {
-
       isValidationProcessing.current = true;
       hasScanned.current = true;
+
       setScanResult(result);
 
       setTimeout(() => {
         setIsScannerActive(false);
         setScanResult(null);
         qrScanner.stop();
-      }, 10000);
+      }, 15000);
 
       isValidationProcessing.current = false;
       hasScanned.current = false;
     });
 
-    qrScanner.start().catch((error) => {
-      console.error('Error starting QR Scanner:', error);
-    });
+    setIsLoading(true);
+
+    qrScanner
+      .start()
+      .then(() => setIsLoading(false))
+      .catch((error) => {
+        console.error('Error starting QR Scanner:', error);
+        setIsLoading(false);
+      });
 
     return () => {
       qrScanner.stop();
       isValidationProcessing.current = false;
       hasScanned.current = false;
+      setIsLoading(false);
     };
   }, [isScannerActive]);
 
   return {
     videoRef,
     isScannerActive,
+    isLoading,
     scanResult,
     handleCloseScanner,
     setIsScannerActive,

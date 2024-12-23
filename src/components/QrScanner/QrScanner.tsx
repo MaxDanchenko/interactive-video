@@ -25,10 +25,6 @@ const QrScannerComponent = ({setShowHort}: Props) => {
 
   return (
     <Wrapper>
-      {/* Display QR Scan Result */}
-      {scanResult && <ResultMessage>QR Code: {scanResult}</ResultMessage>}
-
-      {/* Video Element */}
       <video
         ref={videoRef}
         playsInline
@@ -42,7 +38,6 @@ const QrScannerComponent = ({setShowHort}: Props) => {
         }}
       />
 
-      {/* Overlay and Scan Frame */}
       {isScannerActive && !scanResult && (
         <>
           <Overlay>
@@ -60,7 +55,6 @@ const QrScannerComponent = ({setShowHort}: Props) => {
         </>
       )}
 
-      {/* Buttons for Start/Stop Scanner */}
       {!isScannerActive ? (
         <StartButton onClick={() => setIsScannerActive(true)}>Start Scanner</StartButton>
       ) : (
@@ -98,13 +92,6 @@ const StopButton = styled(StartButton)`
     top: 10px;
     right: 10px;
     background-color: #cc0000;
-`;
-
-const ResultMessage = styled.div`
-    margin-top: 20px;
-    color: white;
-    font-size: 18px;
-    text-align: center;
 `;
 
 const Overlay = styled.div`
