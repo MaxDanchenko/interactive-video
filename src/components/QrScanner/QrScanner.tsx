@@ -43,7 +43,7 @@ const QrScannerComponent = ({setShowHort}: Props) => {
       />
 
       {/* Overlay and Scan Frame */}
-      {isScannerActive && (
+      {isScannerActive && !scanResult && (
         <>
           <Overlay>
             <BlurredTop />
