@@ -3,17 +3,33 @@ import { useRef, useState } from 'react';
 const useQrScanner = () => {
   const [isScannerActive, setScannerActive] = useState(false);
   const [scanResult, setScanResult] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const startScanner = async () => {
-    if (!videoRef.current) return;
+    console.log('Starting scanner...');
+    if (!videoRef.current) {
+      console.error('Video element is not initialized');
+      return;
+    }
 
     try {
-      videoRef.current.srcObject = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+      // Try to access the back camera first
+      let stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }, // Prefer the back camera
       });
-      videoRef.current.play();
+
+      // Check if the stream contains any video tracks
+      if (!stream.getVideoTracks().length) {
+        console.warn('No back camera found. Switching to front camera...');
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'user' } }, // Fallback to the front camera
+        });
+      }
+
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
       setScannerActive(true);
+      console.log('Camera started');
     } catch (err) {
       console.error('Error starting camera stream:', err);
     }
@@ -25,12 +41,7 @@ const useQrScanner = () => {
       stream.getTracks().forEach((track) => track.stop());
     }
     setScannerActive(false);
-  };
-
-  const handleScan = (result: string) => {
-    console.log('Scanned Result:', result);
-    setScanResult(result);
-    stopScanner();
+    console.log('Camera stopped');
   };
 
   return {
@@ -39,7 +50,7 @@ const useQrScanner = () => {
     videoRef,
     startScanner,
     stopScanner,
-    handleScan,
+    setScanResult, // Expose setScanResult if you need manual result handling
   };
 };
 

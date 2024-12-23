@@ -1,29 +1,35 @@
-
 import styled from '@emotion/styled';
 import useQrScanner from '../../hooks/useQrScanner.ts';
+import { useEffect } from 'react';
 
 const QrScannerComponent = () => {
-  const {
-    isScannerActive,
-    scanResult,
-    videoRef,
-    startScanner,
-    stopScanner,
-  } = useQrScanner();
+  const { isScannerActive, videoRef, startScanner, stopScanner } = useQrScanner();
+
+  useEffect(() => {
+    if (isScannerActive) {
+      console.log('Scanner is active');
+    }
+  }, [isScannerActive]);
+
+  useEffect(() => {
+    console.log('Video ref current:', videoRef.current);
+  }, [videoRef]);
 
   return (
     <Wrapper>
-      {!isScannerActive && (
-        <StartButton onClick={startScanner}>Start Scanner</StartButton>
-      )}
+      <video
+        ref={videoRef}
+        playsInline
+        muted
+        style={{
+          display: isScannerActive ? 'block' : 'none',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
       {isScannerActive && (
-        <div>
-          <video
-            ref={videoRef}
-            playsInline
-            muted
-            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+        <>
           <Overlay>
             <BlurredTop />
             <BlurredBottom />
@@ -36,10 +42,13 @@ const QrScannerComponent = () => {
             <CornerMarker className="bottom-left" />
             <CornerMarker className="bottom-right" />
           </ScanFrame>
-          <StopButton onClick={stopScanner}>Stop Scanner</StopButton>
-        </div>
+        </>
       )}
-      {scanResult && <ResultMessage>Scanned Result: {scanResult}</ResultMessage>}
+      {!isScannerActive ? (
+        <StartButton onClick={startScanner}>Start Scanner</StartButton>
+      ) : (
+        <StopButton onClick={stopScanner}>Stop Scanner</StopButton>
+      )}
     </Wrapper>
   );
 };
@@ -73,14 +82,6 @@ const StopButton = styled(StartButton)`
     background-color: #cc0000;
 `;
 
-const ResultMessage = styled.div`
-    margin-top: 20px;
-    color: white;
-    font-size: 18px;
-    text-align: center;
-`;
-
-// Reuse Overlay, Blurred sections, ScanFrame, and CornerMarker styles
 const Overlay = styled.div`
     position: absolute;
     top: 0;
@@ -133,37 +134,37 @@ const ScanFrame = styled.div`
 `;
 
 const CornerMarker = styled.div`
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  border: 3px solid #00cc00;
-  pointer-events: none;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border: 3px solid #00cc00;
+    pointer-events: none;
 
-  &.top-left {
-    top: 0;
-    left: 0;
-    border-right: none;
-    border-bottom: none;
-  }
+    &.top-left {
+        top: 0;
+        left: 0;
+        border-right: none;
+        border-bottom: none;
+    }
 
-  &.top-right {
-    top: 0;
-    right: 0;
-    border-left: none;
-    border-bottom: none;
-  }
+    &.top-right {
+        top: 0;
+        right: 0;
+        border-left: none;
+        border-bottom: none;
+    }
 
-  &.bottom-left {
-    bottom: 0;
-    left: 0;
-    border-right: none;
-    border-top: none;
-  }
+    &.bottom-left {
+        bottom: 0;
+        left: 0;
+        border-right: none;
+        border-top: none;
+    }
 
-  &.bottom-right {
-    bottom: 0;
-    right: 0;
-    border-left: none;
-    border-top: none;
-  }
+    &.bottom-right {
+        bottom: 0;
+        right: 0;
+        border-left: none;
+        border-top: none;
+    }
 `;
