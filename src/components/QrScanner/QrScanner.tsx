@@ -2,14 +2,26 @@ import styled from '@emotion/styled';
 import useQrScanner from '../../hooks/useQrScanner';
 import { useEffect } from 'react';
 
-const QrScannerComponent = () => {
-  const { isScannerActive, videoRef, startScanner, stopScanner, scanResult } = useQrScanner();
+type Props = {
+  setShowHort: (show: boolean) => void;
+}
+
+const QrScannerComponent = ({setShowHort}: Props) => {
+  const {
+    isScannerActive,
+    setIsScannerActive,
+    videoRef,
+    scanResult,
+  } = useQrScanner();
 
   useEffect(() => {
     if (scanResult) {
       console.log('QR Code Result:', scanResult);
+      setShowHort(true)
+    } else {
+      setShowHort(false)
     }
-  }, [scanResult]);
+  }, [scanResult, setShowHort]);
 
   return (
     <Wrapper>
@@ -26,7 +38,7 @@ const QrScannerComponent = () => {
           width: 'inherit',
           height: 'inherit',
           objectFit: 'cover',
-          opacity: 1
+          opacity: 1,
         }}
       />
 
@@ -50,9 +62,9 @@ const QrScannerComponent = () => {
 
       {/* Buttons for Start/Stop Scanner */}
       {!isScannerActive ? (
-        <StartButton onClick={startScanner}>Start Scanner</StartButton>
+        <StartButton onClick={() => setIsScannerActive(true)}>Start Scanner</StartButton>
       ) : (
-        <StopButton onClick={stopScanner}>Stop Scanner</StopButton>
+        <StopButton onClick={() => setIsScannerActive(false)}>Stop Scanner</StopButton>
       )}
     </Wrapper>
   );
@@ -68,6 +80,7 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
     background-color: black;
+    flex-direction: column;
 `;
 
 const StartButton = styled.button`
@@ -134,15 +147,15 @@ const BlurredRight = styled(BlurredLeft)`
 `;
 
 const ScanFrame = styled.div`
-    position: absolute;
-    width: 80vw;
-    height: 80vw;
-    max-width: 300px;
-    max-height: 300px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
+  position: absolute;
+  width: 80vw;
+  height: 80vw;
+  max-width: 300px;
+  max-height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 `;
 
 const CornerMarker = styled.div`
